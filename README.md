@@ -1,4 +1,4 @@
 2009-Lung-miRNA
 ===============
 
-R Project to Analyze miRNA arrays from lung cancer cell lines
+R Project to Analyze miRNA arrays from lung cancer cell lines.
