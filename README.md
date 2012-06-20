@@ -1,4 +1,1 @@
-r-skeleton
-==========
-
-A new project skeleton for R
+R Project to Analyze miRNA arrays from lung cancer cell lines.
