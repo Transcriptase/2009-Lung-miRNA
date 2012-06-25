@@ -37,7 +37,9 @@ if (!is.list(other.columns)){
             }
 
 if (is.null(exp.names)){
-annotation = c( "ControlType", "ProbeName","GeneName")
+annotation = c( "ControlType", "ProbeName","SystematicName")
+#changed "GeneName" to "SystematicName" to match file
+#will need to track this change through future processing
 }
 
 if (is.null(exp.names)){
@@ -69,7 +71,7 @@ Newagi$targets = data.frame(targets$FileName)
 rownames(Newagi$targets) = exp.names
 colnames(Newagi$targets) = "FileName"
 
-# $genes ("ControlType","ProbeName","GeneName") 
+# $genes ("ControlType","ProbeName","SystematicName") 
 j <- match(annotation, colnames(obj), 0)
 if (any(j > 0)){
             Newagi$genes <- data.frame(obj[, j, drop = FALSE], check.names = FALSE)

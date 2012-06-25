@@ -5,6 +5,7 @@ library("AgiMicroRna")
 SCRIPT_PATH <- "~/GitHub/2009-Lung-miRNA/2009-lung-mirna"
 setwd(SCRIPT_PATH)
 source("read.agiMicroRna.R")
+source("tgsMicroRna.R")
 
 #Read target file
 TARGET_PATH <- "~/GitHub/2009-Lung-miRNA/data/sample_groups.txt"
@@ -37,3 +38,25 @@ dd <- read.agiMicroRna(targets,
                                           BGKus="gBGUsed"),
                        annotation = c( "ControlType", "ProbeName","GeneName"),
                        verbose=TRUE)
+
+#Because we got the compact and not the full output files, the RMA
+#normalization method is not available. Going with a process that
+#mimics AFE's approach using Total Gene Signal instead.
+
+ddTGS = tgsMicroRna(dd, half = TRUE, makePLOT = FALSE,verbose = FALSE)
+ddNORM = tgsNormalization(ddTGS, "quantile", makePLOTpre = FALSE,
+                          makePLOTpost = FALSE, targets,
+                          verbose = TRUE)
+ddPROC = filterMicroRna(ddNORM, 
+                        dd, 
+                        control = TRUE, 
+                        IsGeneDetected = TRUE,
+                        wellaboveNEG = FALSE, 
+                        limIsGeneDetected = 50, 
+                        limNEG = 25,
+                        makePLOT = FALSE, 
+                        targets, 
+                        verbose = TRUE,
+                        writeout = FALSE)
+esetPROC = esetMicroRna(ddPROC, targets, makePLOT = FALSE, verbose = TRUE)
+
