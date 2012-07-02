@@ -7,6 +7,7 @@ setwd(SCRIPT_PATH)
 source("read.agiMicroRna.R")
 source("tgsMicroRna.R")
 source("fixed_esetMicroRna.R")
+source("data_vis_functions.R")
 
 #Read target file
 TARGET_PATH <- "~/GitHub/2009-Lung-miRNA/data/sample_groups.txt"
@@ -79,10 +80,36 @@ DE = getDecideTests(fit2,
                     MTestmethod = MTestmethod, 
                     PVcut = PVcut, 
                     verbose = TRUE)
+#output full results to file
 RESULTS_PATH = "G:/Project - Lung miRNA Expression Analysis/Results"
 setwd(RESULTS_PATH)
 write.fit(fit2, results = DE, "CTRvsCT.txt", adjust = "BH")
 
+#make heatmap of significant miRNAs
+#generate top table
+num_sig <- length(which(topTable(
+    fit2,
+    adjust.method = "BH",
+    number = length(fit2$genes[,1]))$adj.P.Val<0.05
+                        ))
+CRTvsCR_results <- topTable(fit2,
+                            number=num_sig,
+                            adjust.method='BH')
+
+#format expression data for extraction
+df.eset <- as(esetPROC, "data.frame")
+annot <- cbind(Number = seq(from = 1, to = 24, by = 1),
+               Treatment = as.character(targets$Treatment),
+               FileName = as.character(targets$FileName),
+               Replicate = c(1, 1, 1, 2, 3, 1, 2, 3,
+                             1, 2, 3, 4, 5, 6, 1, 2,
+                             1, 2, 3, 4, 1, 2, 3, 4)
+               )
+samples <- which(annot[,"Treatment"]%in%c('CR','CTR'))
+
+miRNA_table <- make_table(CRTvsCR_results$ID, samples)
+mir_matrix <- 
+#id miRNAs from Zhang review that are diff. exp.
 miRNAs_of_interest <- c("mmu-miR-9",
                         "mmu-miR-15b",
                         "mmu-miR-27",
@@ -121,5 +148,7 @@ miRNAs_of_interest <- c("mmu-miR-9",
                         "mmu-miR-520c")
 mat.DE <- matrix(DE)
 rownames(mat.DE) <- rownames(DE)
-miRNA_interest_results <- which(rownames(dat.DE) %in% miRNAs_of_interest)
-sig_miRNA_of_interest <- rownames()
+miRNA_interest_results<- which(
+    rownames(mat.DE) %in% miRNAs_of_interest)
+sig_miRNA_of_interest <- mat.DE[miRNA_interest_results[
+    which(mat.DE[miRNA_interest_results] != 0 )],]
